@@ -429,7 +429,7 @@ open class PieChartRenderer: DataRenderer
                         ChartUtils.drawText(
                             context: context,
                             text: valueText,
-                            point: labelPoint,
+                            point: CGPoint(x: labelPoint.x, y: labelPoint.y + lineHeight),
                             align: align,
                             attributes: [NSFontAttributeName: valueFont, NSForegroundColorAttributeName: valueTextColor]
                         )
@@ -439,7 +439,7 @@ open class PieChartRenderer: DataRenderer
                             ChartUtils.drawText(
                                 context: context,
                                 text: pe!.label!,
-                                point: CGPoint(x: labelPoint.x, y: labelPoint.y + lineHeight),
+                                point: labelPoint,
                                 align: align,
                                 attributes: [
                                     NSFontAttributeName: entryLabelFont ?? valueFont,
