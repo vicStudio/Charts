@@ -323,6 +323,67 @@ open class PieChartRenderer: DataRenderer
             
             guard let formatter = dataSet.valueFormatter else { continue }
             
+            // 先计算按左右分布的总数目
+            var totalInLeft = 0
+            var totalInRight = 0
+            for j in 0 ..< dataSet.entryCount
+            {
+                guard let _ = dataSet.entryForIndex(j) else { continue }
+                
+                if xIndex == 0
+                {
+                    angle = 0.0
+                }
+                else
+                {
+                    angle = absoluteAngles[xIndex - 1] * CGFloat(phaseX)
+                }
+                
+                let sliceAngle = drawAngles[xIndex]
+                let sliceSpace = getSliceSpace(dataSet: dataSet)
+                let sliceSpaceMiddleAngle = sliceSpace / (ChartUtils.Math.FDEG2RAD * labelRadius)
+                
+                // offset needed to center the drawn text in the slice
+                let angleOffset = (sliceAngle - sliceSpaceMiddleAngle / 2.0) / 2.0
+                
+                angle = angle + angleOffset
+                
+                let transformedAngle = rotationAngle + angle * CGFloat(phaseY)
+                
+                let drawXOutside = drawEntryLabels && xValuePosition == .outsideSlice
+                let drawYOutside = drawValues && yValuePosition == .outsideSlice
+                
+                if drawXOutside || drawYOutside
+                {
+                    if transformedAngle.truncatingRemainder(dividingBy: 360.0) >= 90.0 && transformedAngle.truncatingRemainder(dividingBy: 360.0) <= 270.0
+                    { // 左边
+                        totalInLeft += 1
+                    }
+                    else
+                    { // 右边
+                        totalInRight += 1
+                    }
+                }
+                
+                xIndex += 1
+            }
+            
+            xIndex = 0;
+            let maxRow = Int(chart.frame.size.height / (lineHeight * 2))
+            // 左边
+            var drawItemsInLeft = totalInLeft
+            if drawItemsInLeft > maxRow {
+                drawItemsInLeft = maxRow
+            }
+            let spaceInLeft = (chart.frame.size.height - lineHeight * 2 * CGFloat(drawItemsInLeft)) / CGFloat(drawItemsInLeft + 1)
+            // 右边
+            var drawItemsInRight = totalInRight
+            if drawItemsInRight > maxRow {
+                drawItemsInRight = maxRow
+            }
+            let spaceInRight = (chart.frame.size.height - lineHeight * 2 * CGFloat(drawItemsInRight)) / CGFloat(drawItemsInRight + 1)
+            
+            // 画图
             for j in 0 ..< dataSet.entryCount
             {
                 guard let e = dataSet.entryForIndex(j) else { continue }
@@ -400,14 +461,18 @@ open class PieChartRenderer: DataRenderer
                         y: labelRadius * (1 + valueLineLength1) * sliceYBase + center.y)
                     
                     if transformedAngle.truncatingRemainder(dividingBy: 360.0) >= 90.0 && transformedAngle.truncatingRemainder(dividingBy: 360.0) <= 270.0
-                    {
-                        pt2 = CGPoint(x: pt1.x - polyline2Length, y: pt1.y)
+                    { // 左边
+                        let pt2y = chart.frame.size.height - (spaceInLeft + lineHeight + CGFloat(xIndex - totalInRight) * (lineHeight * 2 + spaceInLeft))
+                        
+                        pt2 = CGPoint(x: pt1.x - polyline2Length, y: pt2y)
                         align = .right
                         labelPoint = CGPoint(x: pt2.x - 5, y: pt2.y - lineHeight)
                     }
                     else
-                    {
-                        pt2 = CGPoint(x: pt1.x + polyline2Length, y: pt1.y)
+                    { // 右边
+                        let pt2y = spaceInRight + lineHeight + CGFloat(xIndex) * (lineHeight * 2 + spaceInRight)
+                       
+                        pt2 = CGPoint(x: pt1.x + polyline2Length, y: pt2y)
                         align = .left
                         labelPoint = CGPoint(x: pt2.x + 5, y: pt2.y - lineHeight)
                     }
