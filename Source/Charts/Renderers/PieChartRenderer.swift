@@ -464,14 +464,20 @@ open class PieChartRenderer: DataRenderer
                     
                     if transformedAngle.truncatingRemainder(dividingBy: 360.0) >= 90.0 && transformedAngle.truncatingRemainder(dividingBy: 360.0) <= 270.0
                     { // 左边
-                        if totalInLeft == 1 {
+                        let xIndexInLeft = xIndex - totalInRight
+                        if drawItemsInLeft <= xIndexInLeft {
+                            xIndex += 1
+                            continue
+                        }
+                        
+                        if drawItemsInLeft == 1 {
                             pt2 = CGPoint(x: pt1.x - polyline2Length, y: pt1.y)
                         } else {
-                            let pt2y = chart.frame.size.height - (spaceInLeft + lineHeight + CGFloat(xIndex - totalInRight) * (lineHeight * 2 + spaceInLeft))
+                            let pt2y = chart.frame.size.height - (spaceInLeft + lineHeight + CGFloat(xIndexInLeft) * (lineHeight * 2 + spaceInLeft))
                             let pt2x = -sqrt(pow(radius, 2) - pow((pt2y - chartCenterY), 2)) + chartCenterX
                             
-                            var resultPt2x = pt0.x - polyline2Length
-                            if !pt2x.isNaN && pt0.x > pt2x {
+                            var resultPt2x = pt1.x - polyline2Length
+                            if !pt2x.isNaN && pt1.x > pt2x {
                                 resultPt2x = pt2x - polyline2Length
                             }
                             
@@ -483,14 +489,19 @@ open class PieChartRenderer: DataRenderer
                     }
                     else
                     { // 右边
-                        if totalInRight == 1 {
+                        if drawItemsInRight <= xIndex {
+                            xIndex += 1
+                            continue
+                        }
+                        
+                        if drawItemsInRight == 1 {
                              pt2 = CGPoint(x: pt1.x + polyline2Length, y: pt1.y)
                         } else {
                             let pt2y = spaceInRight + lineHeight + CGFloat(xIndex) * (lineHeight * 2 + spaceInRight)
                             let pt2x = sqrt(pow(radius, 2) - pow((pt2y - chartCenterY), 2)) + chartCenterX
                             
-                            var resultPt2x = pt0.x + polyline2Length
-                            if !pt2x.isNaN && pt0.x < pt2x {
+                            var resultPt2x = pt1.x + polyline2Length
+                            if !pt2x.isNaN && pt1.x < pt2x {
                                 resultPt2x = pt2x + polyline2Length
                             }
                             
