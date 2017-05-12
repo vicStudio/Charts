@@ -370,6 +370,8 @@ open class PieChartRenderer: DataRenderer
             
             xIndex = 0;
             let maxRow = Int(chart.frame.size.height / (lineHeight * 2))
+            let chartCenterX = chart.bounds.size.width / 2.0
+            let chartCenterY = chart.bounds.size.height / 2.0
             // 左边
             var drawItemsInLeft = totalInLeft
             if drawItemsInLeft > maxRow {
@@ -462,17 +464,39 @@ open class PieChartRenderer: DataRenderer
                     
                     if transformedAngle.truncatingRemainder(dividingBy: 360.0) >= 90.0 && transformedAngle.truncatingRemainder(dividingBy: 360.0) <= 270.0
                     { // 左边
-                        let pt2y = chart.frame.size.height - (spaceInLeft + lineHeight + CGFloat(xIndex - totalInRight) * (lineHeight * 2 + spaceInLeft))
+                        if totalInLeft == 1 {
+                            pt2 = CGPoint(x: pt1.x - polyline2Length, y: pt1.y)
+                        } else {
+                            let pt2y = chart.frame.size.height - (spaceInLeft + lineHeight + CGFloat(xIndex - totalInRight) * (lineHeight * 2 + spaceInLeft))
+                            let pt2x = -sqrt(pow(radius, 2) - pow((pt2y - chartCenterY), 2)) + chartCenterX
+                            
+                            var resultPt2x = pt1.x - polyline2Length
+                            if !pt2x.isNaN && pt1.x > pt2x {
+                                resultPt2x = pt2x - polyline2Length
+                            }
+                            
+                            pt2 = CGPoint(x: resultPt2x, y: pt2y)
+                        }
                         
-                        pt2 = CGPoint(x: pt1.x - polyline2Length, y: pt2y)
                         align = .right
                         labelPoint = CGPoint(x: pt2.x - 5, y: pt2.y - lineHeight)
                     }
                     else
                     { // 右边
-                        let pt2y = spaceInRight + lineHeight + CGFloat(xIndex) * (lineHeight * 2 + spaceInRight)
-                       
-                        pt2 = CGPoint(x: pt1.x + polyline2Length, y: pt2y)
+                        if totalInRight == 1 {
+                             pt2 = CGPoint(x: pt1.x + polyline2Length, y: pt1.y)
+                        } else {
+                            let pt2y = spaceInRight + lineHeight + CGFloat(xIndex) * (lineHeight * 2 + spaceInRight)
+                            let pt2x = sqrt(pow(radius, 2) - pow((pt2y - chartCenterY), 2)) + chartCenterX
+                            
+                            var resultPt2x = pt1.x + polyline2Length
+                            if !pt2x.isNaN && pt1.x < pt2x {
+                                resultPt2x = pt2x + polyline2Length
+                            }
+                            
+                            pt2 = CGPoint(x: resultPt2x, y: pt2y)
+                        }
+                        
                         align = .left
                         labelPoint = CGPoint(x: pt2.x + 5, y: pt2.y - lineHeight)
                     }
