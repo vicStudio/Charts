@@ -507,9 +507,7 @@ open class PieChartRenderer: DataRenderer
                         context.setLineWidth(dataSet.valueLineWidth)
                         
                         context.move(to: CGPoint(x: pt0.x, y: pt0.y))
-                        context.addLine(to: CGPoint(x: pt1.x, y: pt1.y))
-                        context.addLine(to: CGPoint(x: pt2.x, y: pt2.y))
-                        
+                        context.addQuadCurve(to: CGPoint(x: pt2.x, y: pt2.y), control: CGPoint(x: pt1.x, y: pt1.y))
                         context.drawPath(using: CGPathDrawingMode.stroke)
                     }
                     
