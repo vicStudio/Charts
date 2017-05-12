@@ -470,8 +470,8 @@ open class PieChartRenderer: DataRenderer
                             let pt2y = chart.frame.size.height - (spaceInLeft + lineHeight + CGFloat(xIndex - totalInRight) * (lineHeight * 2 + spaceInLeft))
                             let pt2x = -sqrt(pow(radius, 2) - pow((pt2y - chartCenterY), 2)) + chartCenterX
                             
-                            var resultPt2x = pt1.x - polyline2Length
-                            if !pt2x.isNaN && pt1.x > pt2x {
+                            var resultPt2x = pt0.x - polyline2Length
+                            if !pt2x.isNaN && pt0.x > pt2x {
                                 resultPt2x = pt2x - polyline2Length
                             }
                             
@@ -489,8 +489,8 @@ open class PieChartRenderer: DataRenderer
                             let pt2y = spaceInRight + lineHeight + CGFloat(xIndex) * (lineHeight * 2 + spaceInRight)
                             let pt2x = sqrt(pow(radius, 2) - pow((pt2y - chartCenterY), 2)) + chartCenterX
                             
-                            var resultPt2x = pt1.x + polyline2Length
-                            if !pt2x.isNaN && pt1.x < pt2x {
+                            var resultPt2x = pt0.x + polyline2Length
+                            if !pt2x.isNaN && pt0.x < pt2x {
                                 resultPt2x = pt2x + polyline2Length
                             }
                             
